@@ -1,0 +1,5 @@
+Metrics:
+	1. Speed
+	2. Distribution
+	3. Stability with input small fluctuations
+	4. Distribution of output by mod
