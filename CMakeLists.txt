@@ -30,8 +30,16 @@ add_custom_target(
 )
 
 add_custom_target(
-	run-clang-tidy
-	COMMENT Run clang-tidy
-	COMMAND ${Python3_EXECUTABLE} ${PROJECT_SCRIPTS}/run_clang_tidy.py ${PROJECT_SOURCE_DIR}
-	DEPENDS all
+    run-clang-tidy
+    COMMENT Run clang-tidy
+    COMMAND ${Python3_EXECUTABLE} ${PROJECT_SCRIPTS}/run_clang_tidy.py ${PROJECT_SOURCE_DIR}
+    DEPENDS all
 )
+
+add_subdirectory(third-party/cli11)
+
+add_executable(hash_stat src/main.cpp src/sha256.cpp)
+
+target_include_directories(hash_stat PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+target_link_libraries(hash_stat PRIVATE CLI11)
