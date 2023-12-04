@@ -1,9 +1,8 @@
-BLAKE-256
+BLAKE-256       // DONE
 ECOH
 FSB
 GOST
 Grøstl
 HAVAL
-SHA-256
+SHA-256         // DONE
 LSH-512-256
-
