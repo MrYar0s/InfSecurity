@@ -28,19 +28,6 @@ void SHA256::reset()
     m_hash[5] = 0x9b05688c;
     m_hash[6] = 0x1f83d9ab;
     m_hash[7] = 0x5be0cd19;
-
-#ifdef SHA2_224_SEED_VECTOR
-    // if you want SHA2-224 instead then use these seeds
-    // and throw away the last 32 bits of getHash
-    m_hash[0] = 0xc1059ed8;
-    m_hash[1] = 0x367cd507;
-    m_hash[2] = 0x3070dd17;
-    m_hash[3] = 0xf70e5939;
-    m_hash[4] = 0xffc00b31;
-    m_hash[5] = 0x68581511;
-    m_hash[6] = 0x64f98fa7;
-    m_hash[7] = 0xbefa4fa4;
-#endif
 }
 
 namespace {

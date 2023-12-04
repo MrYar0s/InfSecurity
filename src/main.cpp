@@ -7,14 +7,20 @@
 #include <CLI/CLI.hpp>
 
 #include <hash2string.hpp>
+
 #include <sha256.hpp>
+#include <keccak.hpp>
 
 std::string hash(const std::string &hash_name, const std::string &data)
 {
     static SHA256 sha256 {};
+    static Keccak keccak {};
 
     if (hash_name == "sha256") {
         return sha256(data.c_str(), data.size());
+    }
+    if (hash_name == "keccak") {
+        return keccak(data.c_str(), data.size());
     }
 
     std::cerr << "Unknown hash function: " << hash_name << std::endl;
