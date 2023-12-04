@@ -10,17 +10,28 @@
 
 #include <sha256.hpp>
 #include <keccak.hpp>
+#include <lazy.hpp>
+#include <blake256.hpp>
 
 std::string hash(const std::string &hash_name, const std::string &data)
 {
     static SHA256 sha256 {};
     static Keccak keccak {};
+    static BLAKE256 blake256 {};
 
     if (hash_name == "sha256") {
         return sha256(data.c_str(), data.size());
     }
     if (hash_name == "keccak") {
         return keccak(data.c_str(), data.size());
+    }
+    if (hash_name == "lazy") {
+        return lazy_hash(data.c_str(), data.size());
+    }
+    if (hash_name == "blake256") {
+        uint8_t out[32] = {};
+        blake256.getHash(out, reinterpret_cast<const uint8_t*>(data.c_str()), data.size());
+        return bytes2hex(out);
     }
 
     std::cerr << "Unknown hash function: " << hash_name << std::endl;
