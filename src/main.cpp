@@ -3,6 +3,7 @@
 #include <ios>
 #include <iostream>
 #include <string>
+#include <chrono>
 
 #include <CLI/CLI.hpp>
 
@@ -14,7 +15,7 @@
 #include <blake256.hpp>
 #include <gost.hpp>
 
-std::string hash(const std::string &hash_name, const std::string &data)
+inline std::string hash(const std::string &hash_name, const std::string &data)
 {
     static SHA256 sha256 {};
     static Keccak keccak {};
@@ -34,11 +35,7 @@ std::string hash(const std::string &hash_name, const std::string &data)
         return blake256(data.c_str(), data.size());
     }
     if (hash_name == "gost") {
-        uint8_t out[32] = {};
-        gost.reset();
-        gost.update(reinterpret_cast<const uint8_t *>(data.c_str()), data.size());
-        gost.final(out);
-        return bytes2hex(out);
+        return gost(data.c_str(), data.size());
     }
 
     std::cerr << "Unknown hash function: " << hash_name << std::endl;
@@ -48,10 +45,6 @@ std::string hash(const std::string &hash_name, const std::string &data)
 int main(int argc, char **argv)
 {
     CLI::App app("Hash stat");
-
-    std::string output_file {};
-    auto *output_arg = app.add_option("-o,--out", output_file, "Output file");
-    output_arg->required();
 
     std::string input_file {};
     auto *input_arg = app.add_option("--in", input_file, "Input file");
@@ -64,12 +57,29 @@ int main(int argc, char **argv)
     CLI11_PARSE(app, argc, argv);
 
     std::ifstream in {input_file};
-    std::ofstream out {output_file};
 
     std::string to_hash {};
+#ifdef MEASURE_TIME
+    std::ofstream outfile_time ("consumed_time_" + hash_func + ".txt");
+    auto start = std::chrono::high_resolution_clock::now();
+#endif
+#ifndef MEASURE_TIME
+    std::ofstream outfile_hashes ("hashes_for_" + hash_func + ".txt");
+#endif
     while (std::getline(in, to_hash)) {
-        out << hash(hash_func, to_hash) << std::endl;
+        auto hash_val = hash(hash_func, to_hash);
+#ifndef MEASURE_TIME
+        outfile_hashes << hash_val << std::endl;
+#endif
     }
-
+#ifndef MEASURE_TIME
+    outfile_hashes.close();
+#endif
+#ifdef MEASURE_TIME
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = duration_cast<std::chrono::milliseconds>(stop - start);
+    outfile_time << "Time taken by function: " << duration.count() << " milliseconds" << std::endl;
+    outfile_time.close();
+#endif
     return 0;
 }
