@@ -1,4 +1,5 @@
 #include "blake256.hpp"
+#include "hash2string.hpp"
 #include <array>
 #include <cstdint>
 #include <cstring>
@@ -7,6 +8,14 @@
 BLAKE256::BLAKE256()
 {
     reset();
+}
+
+std::string BLAKE256::operator()(const void *data, size_t num_bytes)
+{
+    uint8_t out[32] = {};
+    reset();
+    getHash(out, reinterpret_cast<const uint8_t *>(data), num_bytes);
+    return bytes2hex(out);
 }
 
 void BLAKE256::reset()

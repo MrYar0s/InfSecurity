@@ -12,12 +12,14 @@
 #include <keccak.hpp>
 #include <lazy.hpp>
 #include <blake256.hpp>
+#include <gost.hpp>
 
 std::string hash(const std::string &hash_name, const std::string &data)
 {
     static SHA256 sha256 {};
     static Keccak keccak {};
     static BLAKE256 blake256 {};
+    static GOST gost {};
 
     if (hash_name == "sha256") {
         return sha256(data.c_str(), data.size());
@@ -29,8 +31,13 @@ std::string hash(const std::string &hash_name, const std::string &data)
         return lazy_hash(data.c_str(), data.size());
     }
     if (hash_name == "blake256") {
+        return blake256(data.c_str(), data.size());
+    }
+    if (hash_name == "gost") {
         uint8_t out[32] = {};
-        blake256.getHash(out, reinterpret_cast<const uint8_t*>(data.c_str()), data.size());
+        gost.reset();
+        gost.update(reinterpret_cast<const uint8_t *>(data.c_str()), data.size());
+        gost.final(out);
         return bytes2hex(out);
     }
 

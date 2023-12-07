@@ -30,6 +30,8 @@ class BLAKE256 final {
 public:
     BLAKE256();
 
+    std::string operator()(const void *data, size_t num_bytes);
+
     void reset();
     void compress(const uint8_t *block);
     void update(const uint8_t *in, int inlen);

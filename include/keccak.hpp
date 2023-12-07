@@ -49,4 +49,4 @@ private:
     void processBuffer();
 };
 
-#endif // KECCAK_HPP
+#endif  // KECCAK_HPP

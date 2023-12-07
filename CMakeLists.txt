@@ -41,7 +41,8 @@ add_subdirectory(third-party/cli11)
 add_executable(hash_stat src/main.cpp
                          src/sha256.cpp
                          src/keccak.cpp
-                         src/blake256.cpp)
+                         src/blake256.cpp
+                         src/gost.cpp)
 
 target_include_directories(hash_stat PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
