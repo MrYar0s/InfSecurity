@@ -1,28 +1,23 @@
 import matplotlib.pyplot as plt
 import re
 
+all_functions = ["sha256", "keccak", "lazy", "blake256", "gost"]
 
-path2dataset = '/home/kseniya/InfSecurity/third-party/datasets/dataset.txt'
-path2gost = '/home/kseniya/InfSecurity/build/consumed_time_gost.txt'
-path2blake256 = '/home/kseniya/InfSecurity/build/consumed_time_blake256.txt'
-path2keccak = '/home/kseniya/InfSecurity/build/consumed_time_keccak.txt'
-path2lazy = '/home/kseniya/InfSecurity/build/consumed_time_lazy.txt'
-path2sha256 = '/home/kseniya/InfSecurity/build/consumed_time_sha256.txt'
-
-len_dataset = sum(1 for line in open(path2dataset, 'r'))
-
-speed = dict()
-speed['GOST'] = len_dataset / float(re.findall(r'\b\d+\b', open(path2gost).readline())[0]) 
-speed['Blake256'] = len_dataset / float(re.findall(r'\b\d+\b', open(path2blake256).readline())[0])
-speed['Keccak'] = len_dataset / float(re.findall(r'\b\d+\b', open(path2keccak).readline())[0])
-speed['Lazy'] = len_dataset / float(re.findall(r'\b\d+\b', open(path2lazy).readline())[0])
-speed['SHA-256'] = len_dataset / float(re.findall(r'\b\d+\b', open(path2sha256).readline())[0])
-
-plt.barh(list(speed.keys()), list(speed.values()), color='mediumorchid')
-plt.grid()
-plt.xlabel('Скорость')
-plt.title('Скорость обработки информации за миллисекунду')
-plt.show()
-plt.savefig('/home/kseniya/InfSecurity/build/plot_speed.png')
-
-
+if __name__ == 'main':
+    parser = argparse.ArgumentParser(description='Collect metrics after processing dataset')
+    parser.add_argument('--path-to-dataset', dest='dataset_path', help='path to raw dataset', required=True)
+    parser.add_argument('--base-dataset-name', dest='dataset', help='name of dataset', required=True)
+    parser.add_argument('--hash-stat-folder', dest='hash_folder', help='path to hash stat folder', required=True)
+    parser.add_argument('--output', dest='output', help='path to output plot folder', required=True)
+    args = parser.parse_args()
+    len_dataset = sum(1 for line in open(args.dataset_path, 'r'))
+    speed = dict()
+    for func in all_functions:
+        hash_path = args.hash_folder + '/hashes_for_' + func + '_' + args.dataset + '.txt'
+        speed[func] = len_dataset / float(re.findall(r'\b\d+\b', open(hash_path).readline())[0])
+    plt.barh(list(speed.keys()), list(speed.values()), color='mediumorchid')
+    plt.grid()
+    plt.xlabel('Скорость')
+    plt.title('Скорость обработки информации за миллисекунду')
+    plt.show()
+    plt.savefig(output + '/plot_speed.png')

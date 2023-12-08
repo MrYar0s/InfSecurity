@@ -63,11 +63,11 @@ int main(int argc, char **argv)
 
     std::string to_hash {};
 #ifdef MEASURE_TIME
-    std::ofstream outfile_time ("consumed_time_" + hash_func + "_" + file_name + ".txt");
+    std::ofstream outfile_time("consumed_time_" + hash_func + "_" + file_name + ".txt");
     auto start = std::chrono::high_resolution_clock::now();
 #endif
 #ifndef MEASURE_TIME
-    std::ofstream outfile_hashes ("hashes_for_" + hash_func + "_" + file_name + ".txt");
+    std::ofstream outfile_hashes("hashes_for_" + hash_func + "_" + file_name + ".txt");
 #endif
     while (std::getline(in, to_hash)) {
         auto hash_val = hash(hash_func, to_hash);

@@ -62,7 +62,7 @@ foreach(dataset_name ${DATASETS})
         COMMAND ${Python3_EXECUTABLE} ${PROJECT_RESEARCH_SCRIPTS}/collector.py
                                     --name-of-program ${PROJECT_BINARY_DIR}/hash_time_stat
                                     --dataset-file ${DATASET_FOLDER}/${dataset_name}
-        DEPENDS hash_stat ${DATASET_FOLDER}
+        DEPENDS hash_time_stat ${DATASET_FOLDER}/${dataset_name}
     )
 
     add_custom_target(collect_data_${dataset_name}
@@ -71,14 +71,15 @@ foreach(dataset_name ${DATASETS})
                                       --name-of-program ${PROJECT_BINARY_DIR}/hash_stat
                                       --dataset-file ${DATASET_FOLDER}/${dataset_name}
                                       --execute-in-parallel True
-        DEPENDS hash_stat ${DATASET_FOLDER}
+        DEPENDS hash_stat ${DATASET_FOLDER}/${dataset_name}
     )
 
     add_custom_target(convert_one_bit_in_${dataset_name}
         COMMENT Convert one random bit in random character in ${dataset_name} file
         COMMAND ${Python3_EXECUTABLE} ${PROJECT_RESEARCH_SCRIPTS}/converter.py
                                       --output ${DATASET_FOLDER}/converted_${dataset_name}
-                                       --input ${DATASET_FOLDER}/${dataset_name}
+                                      --input ${DATASET_FOLDER}/${dataset_name}
+        DEPENDS ${DATASET_FOLDER}/${dataset_name}
     )
 
     add_custom_target(compare_by_bits_${dataset_name}
@@ -86,5 +87,25 @@ foreach(dataset_name ${DATASETS})
         COMMAND ${Python3_EXECUTABLE} ${PROJECT_RESEARCH_SCRIPTS}/plot_hist.py
                                       --base-dataset-name ${dataset_name}
                                       --hash-stat-folder ${PROJECT_BINARY_DIR}
+        DEPENDS convert_one_bit_in_${dataset_name}
+    )
+
+    add_custom_target(plot_collisions_${dataset_name}
+        COMMENT Plot hash collisions based on collected data from ${dataset_name}
+        COMMAND ${Python3_EXECUTABLE} ${PROJECT_RESEARCH_SCRIPTS}/plot_collisions.py
+                                      --base-dataset-name ${dataset_name}
+                                      --hash-stat-folder ${PROJECT_BINARY_DIR}
+                                      --output ${PROJECT_SOURCE_DIR}/pictures/collisions/
+        DEPENDS ${DATASET_FOLDER}/${dataset_name} collect_data_${dataset_name}
+    )
+
+    add_custom_target(plot_speed_${dataset_name}
+        COMMENT Plot hash collisions based on collected data from ${dataset_name}
+        COMMAND ${Python3_EXECUTABLE} ${PROJECT_RESEARCH_SCRIPTS}/plot_collisions.py
+                                      --path-to-dataset ${DATASET_FOLDER}/${dataset_name}
+                                      --base-dataset-name ${dataset_name}
+                                      --hash-stat-folder ${PROJECT_BINARY_DIR}
+                                      --output ${PROJECT_SOURCE_DIR}/pictures/speed/
+        DEPENDS ${DATASET_FOLDER}/${dataset_name} collect_data_${dataset_name} ${DATASET_FOLDER}/${dataset_name}
     )
 endforeach()
