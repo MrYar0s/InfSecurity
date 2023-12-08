@@ -11,7 +11,6 @@ def collect_stats(program, file_path, func):
     os.system(f"{program} --in {file_path} --hash {func}")
 
 def collect_stats_parallel(program, file_path):
-    
     agents = len(all_functions)
     chunksize = 1
     arguments = [(program, file_path, func) for func in all_functions]

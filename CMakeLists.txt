@@ -15,7 +15,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(PROJECT_THIRD_PARTY ${CMAKE_CURRENT_SOURCE_DIR}/third-party)
 set(PROJECT_INFRA_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/scripts/infra)
 set(PROJECT_RESEARCH_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/scripts/research)
-set(DATASET_FOLDER ${PROJECT_THIRD_PARTY}/datasets)
+set(DATASET_FOLDER ${PROJECT_SOURCE_DIR}/datasets)
+
+include(${DATASET_FOLDER}/datasets.cmake)
 
 execute_process(
     COMMAND ${Python3_EXECUTABLE} ${PROJECT_INFRA_SCRIPTS}/install_third_party.py
@@ -54,19 +56,29 @@ target_compile_definitions(hash_time_stat PRIVATE -DMEASURE_TIME)
 target_include_directories(hash_time_stat PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(hash_time_stat PRIVATE CLI11)
 
-add_custom_target(collect_data
-    COMMENT Collecting hash functions data
-    COMMAND ${Python3_EXECUTABLE} ${PROJECT_RESEARCH_SCRIPTS}/collector.py
-                                  --name-of-program ${PROJECT_BINARY_DIR}/hash_stat
-                                  --dataset-file ${DATASET_FOLDER}/rockyou.txt
-                                  --execute-in-parallel True
-    DEPENDS hash_stat ${DATASET_FOLDER}
-)
+foreach(dataset_name ${DATASETS})
+    add_custom_target(collect_time_${dataset_name}
+        COMMENT Collecting times
+        COMMAND ${Python3_EXECUTABLE} ${PROJECT_RESEARCH_SCRIPTS}/collector.py
+                                    --name-of-program ${PROJECT_BINARY_DIR}/hash_time_stat
+                                    --dataset-file ${DATASET_FOLDER}/${dataset_name}
+        DEPENDS hash_stat ${DATASET_FOLDER}
+    )
 
-add_custom_target(collect_time
-    COMMENT Collecting hash functions data
-    COMMAND ${Python3_EXECUTABLE} ${PROJECT_RESEARCH_SCRIPTS}/collector.py
-                                  --name-of-program ${PROJECT_BINARY_DIR}/hash_time_stat
-                                  --dataset-file ${DATASET_FOLDER}/rockyou.txt
-    DEPENDS hash_stat ${DATASET_FOLDER}
-)
+    add_custom_target(collect_data_${dataset_name}
+        COMMENT Collecting hash functions data
+        COMMAND ${Python3_EXECUTABLE} ${PROJECT_RESEARCH_SCRIPTS}/collector.py
+                                      --name-of-program ${PROJECT_BINARY_DIR}/hash_stat
+                                      --dataset-file ${DATASET_FOLDER}/${dataset_name}
+                                      --execute-in-parallel True
+        DEPENDS hash_stat ${DATASET_FOLDER}
+    )
+
+    add_custom_target(convert_one_bit_in_${dataset_name}
+        COMMENT Convert one random bit in random character in ${dataset_name} file
+        COMMAND ${Python3_EXECUTABLE} ${PROJECT_RESEARCH_SCRIPTS}/converter.py
+                                      --output ${DATASET_FOLDER}/converted_${dataset_name}
+                                       --input ${DATASET_FOLDER}/${dataset_name}
+    )
+
+endforeach()
