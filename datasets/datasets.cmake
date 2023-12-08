@@ -1,0 +1,3 @@
+set(DATASETS
+    dataset.txt
+)
