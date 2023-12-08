@@ -81,4 +81,10 @@ foreach(dataset_name ${DATASETS})
                                        --input ${DATASET_FOLDER}/${dataset_name}
     )
 
+    add_custom_target(compare_by_bits_${dataset_name}
+        COMMENT Compare two almost similar files in input by their hashes
+        COMMAND ${Python3_EXECUTABLE} ${PROJECT_RESEARCH_SCRIPTS}/plot_hist.py
+                                      --base-dataset-name ${dataset_name}
+                                      --hash-stat-folder ${PROJECT_BINARY_DIR}
+    )
 endforeach()
