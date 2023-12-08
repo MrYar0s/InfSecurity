@@ -37,4 +37,4 @@ if __name__ == 'main':
     plt.xlabel('Количество коллизий')
     plt.title('Колличество коллизий на данных на первых 8 байтах')
     plt.show()
-    plt.savefig(output + 'plot_collision_' + n + '.png')
+    plt.savefig(args.output + 'plot_collision_' + n + '.png')
